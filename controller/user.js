@@ -6,7 +6,7 @@ module.exports.renderSignupform = (req, res) => {
 };
 
 
-module.exports.signup = async (req, res) => {
+module.exports.signup = async (req, res, next) => {
    try{
      let { username, email, password } = req.body;
     const newuser = new User({ username, email, password });
@@ -16,10 +16,13 @@ module.exports.signup = async (req, res) => {
         if (err) {
             return next(err);
         }
-    });
-    req.flash('success', 'Welcome to the site!');   
-    res.redirect(req.session.redirectUrl);
 
+        req.flash('success', 'Welcome to the site!');
+
+        const redirectUrl = req.session.redirectUrl || '/listings';
+        delete req.session.redirectUrl;
+        res.redirect(redirectUrl);
+    });
 
    } catch (e) {
     req.flash('error', e.message);
@@ -34,7 +37,7 @@ module.exports.renderLoginform = (req, res) => {
 module.exports.loginform = (req, res) => {
     req.flash('success', 'Welcome back!');
      let redirectUrl = req.session.redirectUrl || '/listings';
-    //  delete req.session.redirectUrl;
+     delete req.session.redirectUrl;
    res.redirect(redirectUrl);
 };
 
